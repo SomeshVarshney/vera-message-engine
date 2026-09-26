@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: vera-message-engine
+    runtime: docker
+    plan: free
+    healthCheckPath: /v1/healthz
+    envVars:
+      - key: VERA_TEAM_NAME
+        value: Somesh Varshney
+      - key: VERA_CONTACT_EMAIL
+        value: someshvarshney23@gmail.com
