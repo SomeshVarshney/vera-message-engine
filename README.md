@@ -1,9 +1,34 @@
-# Vera message engine
+ # Vera message engine
 
 A stateful HTTP service that decides what Vera should say to a merchant next, and says it.
 
 Five endpoints (`/v1/context`, `/v1/tick`, `/v1/reply`, `/v1/healthz`, `/v1/metadata`), FastAPI,
 no database, no model call on the request path.
+
+## Live
+
+    https://vera-message-engine-eh3r.onrender.com
+
+| Method | Path | |
+|---|---|---|
+| POST | `/v1/context` | receive a context push (idempotent on `(context_id, version)`) |
+| POST | `/v1/tick` | decide what, if anything, to send now |
+| POST | `/v1/reply` | handle an inbound turn: `send` / `wait` / `end` |
+| GET | `/v1/healthz` | liveness + contexts loaded |
+| GET | `/v1/metadata` | team, model, approach |
+| POST | `/v1/teardown` | wipe all state (optional, per the brief) |
+
+Scored against the supplied `judge_simulator.py` (`full_evaluation`, gemini-flash-lite,
+9 messages, no heuristic fallbacks):
+
+| Specificity | Category fit | Merchant fit | Decision quality | Engagement | Total |
+|---:|---:|---:|---:|---:|---:|
+| 8.8 | 8.3 | 8.7 | 8.8 | 8.2 | **42.7 / 50** |
+
+All three replay scenarios pass: auto-reply detected and closed by turn 3, explicit commitment
+switches the bot out of qualification, opt-out ends the conversation and suppresses the merchant.
+Across the full generated dataset (50 merchants, 200 customers, 100 triggers) every trigger
+composes, and all 30 canonical test pairs produce a message.
 
 ---
 
